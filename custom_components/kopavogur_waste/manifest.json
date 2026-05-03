@@ -1,0 +1,13 @@
+{
+  "domain": "kopavogur_waste",
+  "name": "Kopavogur Waste Collection",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/YOUR_GITHUB_USERNAME/ha-kopavogur-waste",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/YOUR_GITHUB_USERNAME/ha-kopavogur-waste/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

@@ -1,0 +1,22 @@
+{
+  "title": "Kópavogur Waste Collection",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Kópavogur waste collection",
+        "description": "Enter your address as shown on the Kópavogur waste collection page, for example: Kársnesbraut 21",
+        "data": {"address": "Address"}
+      },
+      "manual": {
+        "title": "Manual setup",
+        "description": "Use this if address lookup changes. Location ID is the number used by the pickup API.",
+        "data": {"address": "Address", "location_id": "Location ID"}
+      }
+    },
+    "error": {
+      "cannot_resolve": "Could not resolve this address. Try the exact address from the Kópavogur page, or use manual setup.",
+      "unknown": "Unexpected error"
+    },
+    "abort": {"already_configured": "This address/location is already configured"}
+  }
+}
