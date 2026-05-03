@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Select municipality",
+        "description": "Choose your municipality.",
+        "data": {"municipality": "Municipality"}
+      },
+      "kopavogur": {
+        "title": "Kópavogur",
+        "description": "Enter your address as shown on the Kópavogur waste collection page, e.g. Kársnesbraut 21.",
+        "data": {"address": "Address"}
+      },
+      "kopavogur_manual": {
+        "title": "Manual setup (Kópavogur)",
+        "description": "Use this if automatic address lookup fails. Location ID is the number from the pickup API.",
+        "data": {"address": "Address", "location_id": "Location ID"}
+      },
+      "reykjavik": {
+        "title": "Reykjavík",
+        "description": "Enter your street address and house number along with your postal code, e.g. Vonarstræti 4 and 101.",
+        "data": {"address": "Address", "postal_code": "Postal code"}
+      }
+    },
+    "error": {
+      "cannot_resolve": "Could not find this address. Please check and try again.",
+      "no_data": "Address found but no pickup data is available.",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This address is already configured"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Iceland Waste Calendar",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Veldu sveitarfélag",
+        "description": "Veldu þitt sveitarfélag.",
+        "data": {"municipality": "Sveitarfélag"}
+      },
+      "kopavogur": {
+        "title": "Kópavogur",
+        "description": "Sláðu inn heimilisfangið þitt eins og það birtist á sorphirðusíðu Kópavogs, t.d. Kársnesbraut 21.",
+        "data": {"address": "Heimilisfang"}
+      },
+      "kopavogur_manual": {
+        "title": "Handvirk uppsetning (Kópavogur)",
+        "description": "Notaðu þetta ef sjálfvirk leit virkar ekki. Staðsetningarauðkenni er talan úr API.",
+        "data": {"address": "Heimilisfang", "location_id": "Staðsetningarauðkenni"}
+      },
+      "reykjavik": {
+        "title": "Reykjavík",
+        "description": "Sláðu inn götuheiti og húsnúmer ásamt póstnúmeri, t.d. Vonarstræti 4 og 101.",
+        "data": {"address": "Heimilisfang", "postal_code": "Póstnúmer"}
+      }
+    },
+    "error": {
+      "cannot_resolve": "Fann ekki þetta heimilisfang. Athugaðu og reyndu aftur.",
+      "no_data": "Heimilisfang fannst en engar sorphirðuupplýsingar eru tiltækar.",
+      "unknown": "Óvænt villa"
+    },
+    "abort": {
+      "already_configured": "Þetta heimilisfang er þegar uppsett"
+    }
+  }
+}
