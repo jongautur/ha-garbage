@@ -2,12 +2,12 @@
   "config": {
     "step": {
       "user": {
-        "title": "Select municipality",
-        "description": "Choose your municipality.",
-        "data": {"municipality": "Municipality"}
+        "title": "Iceland Waste Calendar",
+        "description": "Enter your postal code to identify your municipality.",
+        "data": {"postal_code": "Postal code"}
       },
       "kopavogur": {
-        "title": "Kópavogur",
+        "title": "Kópavogur — address",
         "description": "Enter your address as shown on the Kópavogur waste collection page, e.g. Kársnesbraut 21.",
         "data": {"address": "Address"}
       },
@@ -17,17 +17,19 @@
         "data": {"address": "Address", "location_id": "Location ID"}
       },
       "reykjavik": {
-        "title": "Reykjavík",
-        "description": "Enter your street address and house number along with your postal code, e.g. Vonarstræti 4 and 101.",
-        "data": {"address": "Address", "postal_code": "Postal code"}
+        "title": "Reykjavík — address",
+        "description": "Enter your street address and house number, e.g. Vonarstræti 4.",
+        "data": {"address": "Address"}
       },
       "hafnarfjordur": {
-        "title": "Hafnarfjörður",
+        "title": "Hafnarfjörður — street name",
         "description": "Enter your street name (without house number), e.g. Strandgata.",
         "data": {"address": "Street name"}
       }
     },
     "error": {
+      "postal_code_not_found": "This postal code is not recognised. Please check and try again.",
+      "municipality_not_supported": "This municipality is not yet supported.",
       "cannot_resolve": "Could not find this address. Please check and try again.",
       "no_data": "Address found but no pickup data is available.",
       "unknown": "Unexpected error"

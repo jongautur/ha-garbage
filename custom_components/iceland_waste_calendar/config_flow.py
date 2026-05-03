@@ -17,44 +17,43 @@ from .const import (
     MUNICIPALITY_NAMES,
     MUNICIPALITY_REYKJAVIK,
 )
-
-STEP_MUNICIPALITY_SCHEMA = vol.Schema({
-    vol.Required(CONF_MUNICIPALITY): vol.In(MUNICIPALITY_NAMES),
-})
-
-STEP_KOPAVOGUR_SCHEMA = vol.Schema({vol.Required(CONF_ADDRESS): str})
-
-STEP_KOPAVOGUR_MANUAL_SCHEMA = vol.Schema({
-    vol.Required(CONF_ADDRESS): str,
-    vol.Required(CONF_LOCATION_ID): str,
-})
-
-STEP_REYKJAVIK_SCHEMA = vol.Schema({
-    vol.Required(CONF_ADDRESS): str,
-    vol.Required(CONF_POSTAL_CODE): str,
-})
+from .postal_codes import POSTAL_CODE_MAP
 
 
 class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     def __init__(self):
-        self._municipality: str | None = None
+        self._municipality: str = ""
+        self._postal_code: str = ""
+
+    # ------------------------------------------------------------------
+    # Step 1 — postal code lookup
+    # ------------------------------------------------------------------
 
     async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is not None:
-            self._municipality = user_input[CONF_MUNICIPALITY]
-            if self._municipality == MUNICIPALITY_KOPAVOGUR:
-                return await self.async_step_kopavogur()
-            if self._municipality == MUNICIPALITY_REYKJAVIK:
-                return await self.async_step_reykjavik()
-            if self._municipality == MUNICIPALITY_HAFNARFJORDUR:
-                return await self.async_step_hafnarfjordur()
+            postal_code = user_input[CONF_POSTAL_CODE].strip()
+            municipality = POSTAL_CODE_MAP.get(postal_code)
+
+            if municipality is None:
+                errors["base"] = "postal_code_not_found"
+            elif municipality not in MUNICIPALITY_NAMES:
+                errors["base"] = "municipality_not_supported"
+            else:
+                self._municipality = municipality
+                self._postal_code = postal_code
+                if municipality == MUNICIPALITY_KOPAVOGUR:
+                    return await self.async_step_kopavogur()
+                if municipality == MUNICIPALITY_REYKJAVIK:
+                    return await self.async_step_reykjavik()
+                if municipality == MUNICIPALITY_HAFNARFJORDUR:
+                    return await self.async_step_hafnarfjordur()
 
         return self.async_show_form(
             step_id="user",
-            data_schema=STEP_MUNICIPALITY_SCHEMA,
+            data_schema=vol.Schema({vol.Required(CONF_POSTAL_CODE): str}),
             errors=errors,
         )
 
@@ -68,17 +67,18 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             address = user_input[CONF_ADDRESS].strip()
             api = KopavogurApi(async_get_clientsession(self.hass))
             try:
-                candidate = await api.async_search_locations(address)
-                if not candidate:
+                candidates = await api.async_search_locations(address)
+                if not candidates:
                     errors["base"] = "cannot_resolve"
                 else:
-                    loc = candidate[0]
+                    loc = candidates[0]
                     await self.async_set_unique_id(f"kopavogur_{loc.id}")
                     self._abort_if_unique_id_configured()
                     return self.async_create_entry(
                         title=f"Kópavogur - {loc.title}",
                         data={
                             CONF_MUNICIPALITY: MUNICIPALITY_KOPAVOGUR,
+                            CONF_POSTAL_CODE: self._postal_code,
                             CONF_ADDRESS: address,
                             CONF_LOCATION_ID: loc.id,
                         },
@@ -90,7 +90,7 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="kopavogur",
-            data_schema=STEP_KOPAVOGUR_SCHEMA,
+            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): str}),
             errors=errors,
         )
 
@@ -104,13 +104,17 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title=f"Kópavogur - {user_input[CONF_ADDRESS]}",
                 data={
                     CONF_MUNICIPALITY: MUNICIPALITY_KOPAVOGUR,
+                    CONF_POSTAL_CODE: self._postal_code,
                     CONF_ADDRESS: user_input[CONF_ADDRESS],
                     CONF_LOCATION_ID: loc_id,
                 },
             )
         return self.async_show_form(
             step_id="kopavogur_manual",
-            data_schema=STEP_KOPAVOGUR_MANUAL_SCHEMA,
+            data_schema=vol.Schema({
+                vol.Required(CONF_ADDRESS): str,
+                vol.Required(CONF_LOCATION_ID): str,
+            }),
             errors=errors,
         )
 
@@ -122,22 +126,21 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             address = user_input[CONF_ADDRESS].strip()
-            postal_code = user_input[CONF_POSTAL_CODE].strip()
             api = ReykjavikApi(async_get_clientsession(self.hass))
             try:
-                pickups = await api.async_get_pickups(address, postal_code)
+                pickups = await api.async_get_pickups(address, self._postal_code)
                 if not pickups:
                     errors["base"] = "no_data"
                 else:
-                    unique_id = f"rvk_{address}_{postal_code}".lower().replace(" ", "_")
+                    unique_id = f"rvk_{address}_{self._postal_code}".lower().replace(" ", "_")
                     await self.async_set_unique_id(unique_id)
                     self._abort_if_unique_id_configured()
                     return self.async_create_entry(
                         title=f"Reykjavík - {address}",
                         data={
                             CONF_MUNICIPALITY: MUNICIPALITY_REYKJAVIK,
+                            CONF_POSTAL_CODE: self._postal_code,
                             CONF_ADDRESS: address,
-                            CONF_POSTAL_CODE: postal_code,
                         },
                     )
             except WasteApiError:
@@ -147,7 +150,7 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="reykjavik",
-            data_schema=STEP_REYKJAVIK_SCHEMA,
+            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): str}),
             errors=errors,
         )
 
@@ -172,6 +175,7 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         title=f"Hafnarfjörður - {street}",
                         data={
                             CONF_MUNICIPALITY: MUNICIPALITY_HAFNARFJORDUR,
+                            CONF_POSTAL_CODE: self._postal_code,
                             CONF_ADDRESS: street,
                         },
                     )

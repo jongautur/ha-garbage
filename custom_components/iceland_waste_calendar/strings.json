@@ -3,12 +3,12 @@
   "config": {
     "step": {
       "user": {
-        "title": "Veldu sveitarfélag",
-        "description": "Veldu þitt sveitarfélag.",
-        "data": {"municipality": "Sveitarfélag"}
+        "title": "Sorphirðudagatal Íslands",
+        "description": "Sláðu inn póstnúmerið þitt til að finna rétta sveitarfélagið.",
+        "data": {"postal_code": "Póstnúmer"}
       },
       "kopavogur": {
-        "title": "Kópavogur",
+        "title": "Kópavogur — heimilisfang",
         "description": "Sláðu inn heimilisfangið þitt eins og það birtist á sorphirðusíðu Kópavogs, t.d. Kársnesbraut 21.",
         "data": {"address": "Heimilisfang"}
       },
@@ -18,17 +18,19 @@
         "data": {"address": "Heimilisfang", "location_id": "Staðsetningarauðkenni"}
       },
       "reykjavik": {
-        "title": "Reykjavík",
-        "description": "Sláðu inn götuheiti og húsnúmer ásamt póstnúmeri, t.d. Vonarstræti 4 og 101.",
-        "data": {"address": "Heimilisfang", "postal_code": "Póstnúmer"}
+        "title": "Reykjavík — heimilisfang",
+        "description": "Sláðu inn götuheiti og húsnúmer, t.d. Vonarstræti 4.",
+        "data": {"address": "Heimilisfang"}
       },
       "hafnarfjordur": {
-        "title": "Hafnarfjörður",
+        "title": "Hafnarfjörður — götuheiti",
         "description": "Sláðu inn götuheiti (án húsnúmers), t.d. Strandgata.",
         "data": {"address": "Götuheiti"}
       }
     },
     "error": {
+      "postal_code_not_found": "Þetta póstnúmer er ekki þekkt. Athugaðu og reyndu aftur.",
+      "municipality_not_supported": "Þetta sveitarfélag er ekki stutt enn sem komið er.",
       "cannot_resolve": "Fann ekki þetta heimilisfang. Athugaðu og reyndu aftur.",
       "no_data": "Heimilisfang fannst en engar sorphirðuupplýsingar eru tiltækar.",
       "unknown": "Óvænt villa"
