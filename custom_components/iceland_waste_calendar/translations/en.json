@@ -7,23 +7,23 @@
         "data": {"postal_code": "Postal code"}
       },
       "kopavogur": {
-        "title": "Kópavogur — address",
-        "description": "Enter your address as shown on the Kópavogur waste collection page, e.g. Kársnesbraut 21.",
-        "data": {"address": "Address"}
+        "title": "Kópavogur — street name",
+        "description": "Enter your street name without house number, e.g. Kársnesbraut.",
+        "data": {"address": "Street name"}
       },
       "kopavogur_manual": {
         "title": "Manual setup (Kópavogur)",
         "description": "Use this if automatic address lookup fails. Location ID is the number from the pickup API.",
-        "data": {"address": "Address", "location_id": "Location ID"}
+        "data": {"address": "Street name", "location_id": "Location ID"}
       },
       "reykjavik": {
-        "title": "Reykjavík — address",
-        "description": "Enter your street address and house number, e.g. Vonarstræti 4.",
-        "data": {"address": "Address"}
+        "title": "Reykjavík — street name",
+        "description": "Enter your street name without house number, e.g. Vonarstræti.",
+        "data": {"address": "Street name"}
       },
       "hafnarfjordur": {
         "title": "Hafnarfjörður — street name",
-        "description": "Enter your street name (without house number), e.g. Strandgata.",
+        "description": "Enter your street name without house number, e.g. Strandgata.",
         "data": {"address": "Street name"}
       }
     },

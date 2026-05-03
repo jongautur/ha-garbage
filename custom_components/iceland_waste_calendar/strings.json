@@ -8,19 +8,19 @@
         "data": {"postal_code": "Póstnúmer"}
       },
       "kopavogur": {
-        "title": "Kópavogur — heimilisfang",
-        "description": "Sláðu inn heimilisfangið þitt eins og það birtist á sorphirðusíðu Kópavogs, t.d. Kársnesbraut 21.",
-        "data": {"address": "Heimilisfang"}
+        "title": "Kópavogur — götuheiti",
+        "description": "Sláðu inn götuheiti (án húsnúmers), t.d. Kársnesbraut.",
+        "data": {"address": "Götuheiti"}
       },
       "kopavogur_manual": {
         "title": "Handvirk uppsetning (Kópavogur)",
         "description": "Notaðu þetta ef sjálfvirk leit virkar ekki. Staðsetningarauðkenni er talan úr API.",
-        "data": {"address": "Heimilisfang", "location_id": "Staðsetningarauðkenni"}
+        "data": {"address": "Götuheiti", "location_id": "Staðsetningarauðkenni"}
       },
       "reykjavik": {
-        "title": "Reykjavík — heimilisfang",
-        "description": "Sláðu inn götuheiti og húsnúmer, t.d. Vonarstræti 4.",
-        "data": {"address": "Heimilisfang"}
+        "title": "Reykjavík — götuheiti",
+        "description": "Sláðu inn götuheiti (án húsnúmers), t.d. Vonarstræti.",
+        "data": {"address": "Götuheiti"}
       },
       "hafnarfjordur": {
         "title": "Hafnarfjörður — götuheiti",
