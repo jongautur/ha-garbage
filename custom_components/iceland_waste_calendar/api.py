@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from .const import RVK_BIN_LABELS
@@ -277,3 +277,96 @@ class ReykjavikApi:
                         )
                         break
         return candidates
+
+
+# ---------------------------------------------------------------------------
+# Hafnarfjörður
+# ---------------------------------------------------------------------------
+
+_HFJ_EVENTS_URL = "https://hafnarfjordur.is/wp-json/avista/get-calendar-events/"
+_WEEKDAY_MAP = {"mo": 0, "tu": 1, "we": 2, "th": 3, "fr": 4, "sa": 5, "su": 6}
+
+
+def _expand_rrule(rrule: dict, today: date, limit: int = 10) -> list[str]:
+    """Expand a weekly rrule into upcoming ISO date strings."""
+    try:
+        dtstart = date.fromisoformat(rrule["dtstart"])
+        until = date.fromisoformat(rrule["until"])
+        interval_weeks = int(rrule.get("interval", 1))
+        days = sorted(_WEEKDAY_MAP[d] for d in (rrule.get("byweekday") or []) if d in _WEEKDAY_MAP)
+    except (KeyError, ValueError, TypeError):
+        return []
+
+    if not days or until < today:
+        return []
+
+    anchor_monday = dtstart - timedelta(days=dtstart.weekday())
+    results: list[str] = []
+    current_monday = anchor_monday
+
+    while current_monday <= until + timedelta(weeks=1) and len(results) < limit:
+        for wd in days:
+            candidate = current_monday + timedelta(days=wd)
+            if candidate < dtstart or candidate < today:
+                continue
+            if candidate > until:
+                return results
+            results.append(candidate.isoformat())
+            if len(results) >= limit:
+                return results
+        current_monday += timedelta(weeks=interval_weeks)
+
+    return results
+
+
+class HafnarfjordurApi:
+    def __init__(self, session) -> None:
+        self._session = session
+
+    async def async_get_pickups(self, street: str) -> list[dict]:
+        async with self._session.get(
+            _HFJ_EVENTS_URL,
+            params={"search_street": street},
+            timeout=20,
+        ) as resp:
+            if resp.status >= 400:
+                raise WasteApiError(f"HTTP {resp.status} from Hafnarfjörður API")
+            try:
+                data = await resp.json(content_type=None)
+            except Exception as err:
+                raise WasteApiError(f"Invalid JSON from Hafnarfjörður API: {err}") from err
+
+        return self._normalize(data)
+
+    def _normalize(self, data: dict) -> list[dict]:
+        events = data.get("events") or []
+        if not events:
+            raise WasteApiError("No events returned — street name not found")
+
+        today = date.today()
+        by_type: dict[str, dict] = {}
+
+        for event in events:
+            props = event.get("extendedProps") or {}
+            trash = props.get("trash_types") or {}
+            bin_id = trash.get("value", "")
+            bin_label = trash.get("label", bin_id)
+            rrule = event.get("rrule") or {}
+
+            if not bin_id or not rrule:
+                continue
+
+            if bin_id not in by_type:
+                by_type[bin_id] = {"label": bin_label, "rrules": []}
+            by_type[bin_id]["rrules"].append(rrule)
+
+        result = []
+        for bin_id in sorted(by_type):
+            info = by_type[bin_id]
+            all_dates: list[str] = []
+            for rrule in info["rrules"]:
+                all_dates.extend(_expand_rrule(rrule, today, limit=10))
+            next_dates = sorted(set(all_dates))[:8]
+            result.append({"id": bin_id, "title": info["label"], "next_dates": next_dates})
+
+        return result

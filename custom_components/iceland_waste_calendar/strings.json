@@ -21,6 +21,11 @@
         "title": "Reykjavík",
         "description": "Sláðu inn götuheiti og húsnúmer ásamt póstnúmeri, t.d. Vonarstræti 4 og 101.",
         "data": {"address": "Heimilisfang", "postal_code": "Póstnúmer"}
+      },
+      "hafnarfjordur": {
+        "title": "Hafnarfjörður",
+        "description": "Sláðu inn götuheiti (án húsnúmers), t.d. Strandgata.",
+        "data": {"address": "Götuheiti"}
       }
     },
     "error": {

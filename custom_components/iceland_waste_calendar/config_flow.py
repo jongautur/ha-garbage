@@ -5,13 +5,14 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import KopavogurApi, ReykjavikApi, WasteApiError
+from .api import HafnarfjordurApi, KopavogurApi, ReykjavikApi, WasteApiError
 from .const import (
     CONF_ADDRESS,
     CONF_LOCATION_ID,
     CONF_MUNICIPALITY,
     CONF_POSTAL_CODE,
     DOMAIN,
+    MUNICIPALITY_HAFNARFJORDUR,
     MUNICIPALITY_KOPAVOGUR,
     MUNICIPALITY_NAMES,
     MUNICIPALITY_REYKJAVIK,
@@ -48,6 +49,8 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return await self.async_step_kopavogur()
             if self._municipality == MUNICIPALITY_REYKJAVIK:
                 return await self.async_step_reykjavik()
+            if self._municipality == MUNICIPALITY_HAFNARFJORDUR:
+                return await self.async_step_hafnarfjordur()
 
         return self.async_show_form(
             step_id="user",
@@ -145,5 +148,40 @@ class IcelandWasteCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="reykjavik",
             data_schema=STEP_REYKJAVIK_SCHEMA,
+            errors=errors,
+        )
+
+    # ------------------------------------------------------------------
+    # Hafnarfjörður
+    # ------------------------------------------------------------------
+
+    async def async_step_hafnarfjordur(self, user_input=None):
+        errors = {}
+        if user_input is not None:
+            street = user_input[CONF_ADDRESS].strip()
+            api = HafnarfjordurApi(async_get_clientsession(self.hass))
+            try:
+                pickups = await api.async_get_pickups(street)
+                if not pickups:
+                    errors["base"] = "no_data"
+                else:
+                    unique_id = f"hafnarfjordur_{street.lower().replace(' ', '_')}"
+                    await self.async_set_unique_id(unique_id)
+                    self._abort_if_unique_id_configured()
+                    return self.async_create_entry(
+                        title=f"Hafnarfjörður - {street}",
+                        data={
+                            CONF_MUNICIPALITY: MUNICIPALITY_HAFNARFJORDUR,
+                            CONF_ADDRESS: street,
+                        },
+                    )
+            except WasteApiError:
+                errors["base"] = "cannot_resolve"
+            except Exception:
+                errors["base"] = "unknown"
+
+        return self.async_show_form(
+            step_id="hafnarfjordur",
+            data_schema=vol.Schema({vol.Required(CONF_ADDRESS): str}),
             errors=errors,
         )

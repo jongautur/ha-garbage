@@ -20,6 +20,11 @@
         "title": "Reykjavík",
         "description": "Enter your street address and house number along with your postal code, e.g. Vonarstræti 4 and 101.",
         "data": {"address": "Address", "postal_code": "Postal code"}
+      },
+      "hafnarfjordur": {
+        "title": "Hafnarfjörður",
+        "description": "Enter your street name (without house number), e.g. Strandgata.",
+        "data": {"address": "Street name"}
       }
     },
     "error": {

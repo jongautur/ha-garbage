@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import KopavogurApi, ReykjavikApi, WasteApiError
+from .api import HafnarfjordurApi, KopavogurApi, ReykjavikApi, WasteApiError
 from .const import (
     CONF_ADDRESS,
     CONF_LOCATION_ID,
@@ -17,6 +17,7 @@ from .const import (
     CONF_POSTAL_CODE,
     DEFAULT_SCAN_INTERVAL_HOURS,
     DOMAIN,
+    MUNICIPALITY_HAFNARFJORDUR,
     MUNICIPALITY_KOPAVOGUR,
     MUNICIPALITY_REYKJAVIK,
     MUNICIPALITY_NAMES,
@@ -50,6 +51,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         async def async_update_data():
             try:
                 return await api.async_get_pickups(address, postal_code)
+            except WasteApiError as err:
+                raise UpdateFailed(str(err)) from err
+
+    elif municipality == MUNICIPALITY_HAFNARFJORDUR:
+        api = HafnarfjordurApi(session)
+        device_id = f"hfj_{address.lower().replace(' ', '_')}"
+
+        async def async_update_data():
+            try:
+                return await api.async_get_pickups(address)
             except WasteApiError as err:
                 raise UpdateFailed(str(err)) from err
 
